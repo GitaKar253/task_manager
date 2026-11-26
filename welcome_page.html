@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Welcome Page
+{% endblock %}
+
+{% block main %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Task Manager!</title>
+</head>
+
+<body>
+    <style>
+    body {
+        background-color: #F0F8FF;
+        margin: 0;
+    }
+    .logo {
+        font-size: 72px;
+        color: #1E90FF;
+        font-weight: bold;
+        text-align: center;
+        padding-top: 50px; /* Add some space above the text */
+    }
+
+    /* (Other styles can remain here) */
+    p {
+        font-size: 50px;
+    }
+    .large-text {
+        font-size: 50px;
+    }
+    </style>
+    <header>
+        <nav>
+            <div class="logo">Welcome to Task Manager</div>
+            <div>
+                An all-in-one personal productivity application made for creating, editing, and keeping track of your tasks for daily use!
+            </div>
+        </nav>
+    </header>
+</body>
+</html>
+{% endblock %}

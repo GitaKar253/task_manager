@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block title %}
+   Task History Log
+{% endblock %}
+
+{% block main %}
+
+<!--My dad and AI helped with some of the script-->
+<h2 class="mb-4">Task History Log</h2>
+
+<table style='margin-top: 30px' class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Task Title</th>
+      <th>Action Type</th>
+      <th>Timestamp (UTC)</th>
+      <th>Description</th>
+      <th>Priority</th>
+      <th>Status</th>
+      <th>Due Date</th>
+    </tr>
+  </thead>
+
+  <tbody id="history-body">
+  </tbody>
+</table>
+
+<!--Pagination-->
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <button id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+    <span id="page-info" class="font-weight-bold"></span>
+    <button id="next-btn" class="btn btn-secondary" disabled>Next</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    let currentPage = 1;
+    const perPage = 10;
+
+    const tbody = document.getElementById("history-body");
+    const pageInfo = document.getElementById("page-info");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+
+    async function loadPage(page) {
+        tbody.innerHTML = ""; // Clear table
+
+        try {
+            const res = await fetch(`/user_activities?page=${page}&per_page=${perPage}`);
+            const data = await res.json();
+
+            const rows = data.user_activities;
+
+            rows.forEach(log => {
+                const tr = document.createElement("tr");
+
+                if (log.activity_type === "CREATED") tr.classList.add("table-success");
+                else if (log.activity_type === "EDITED") tr.classList.add("table-warning");
+                else if (log.activity_type === "DELETED") tr.classList.add("table-danger");
+
+                tr.innerHTML = `
+                    <td>${log.title}</td>
+                    <td><strong>${log.activity_type}</strong></td>
+                    <td>${log.activity_time}</td>
+                    <td>${log.description || ""}</td>
+                    <td>${log.priority || ""}</td>
+                    <td>${log.status || ""}</td>
+                    <td>${log.due_date || "N/A"}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+
+            // Update pagination controls
+            currentPage = data.current_page;
+
+            pageInfo.innerText = `Page ${currentPage} of ${data.total_pages}`;
+
+            prevBtn.disabled = !data.has_prev;
+            nextBtn.disabled = !data.has_next;
+
+        } catch (err) {
+            console.error("Error loading history:", err);
+        }
+    }
+
+    // Pagination button handlers
+    prevBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+            loadPage(currentPage - 1);
+        }
+    });
+
+    nextBtn.addEventListener("click", () => {
+        loadPage(currentPage + 1);
+    });
+
+    // Load first page on load
+    loadPage(currentPage);
+});
+</script>
+
+{% endblock %}

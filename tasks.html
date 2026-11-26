@@ -1,0 +1,182 @@
+{% extends "layout.html" %}
+
+{% block title %}
+   Create New Task
+{% endblock %}
+
+{% block main %}
+<!-- Create Task--->
+<h2 class="mb-4 text-center">Add a New Task</h2>
+
+<div class="add-task-border container">
+
+  <form action="/add_task" method="post" class="two-row-form" id="createTaskForm">
+
+        <div class="form-row mb-4 align-items-center">
+
+            <!-- Task Title -->
+            <div class="col-md-4 d-flex align-items-center">
+                <label for="title" class="form-label-left">Task Title</label>
+                <input type="text" class="form-control form-input" id="title" name="title"
+                       placeholder="E.g., Finish Project Report" required>
+            </div>
+
+            <!-- Due Date -->
+            <div class="col-md-4 d-flex align-items-center">
+                <label for="due_date" class="form-label-left">Due Date</label>
+                <input type="date" class="form-control form-input" id="due_date" name="due_date">
+            </div>
+
+            <!-- Priority -->
+            <div class="col-md-4 d-flex align-items-center">
+                <label for="priority" class="form-label-left">Priority</label>
+                <select class="form-control form-input" id="priority" name="priority">
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low" selected>Low</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-row mb-4 align-items-center">
+
+            <!--Status-->
+            <div class="col-md-4 d-flex align-items-center">
+                <label for="status" class="form-label-left">Status</label>
+                <select class="form-control form-input" id="status" name="status">
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="done" selected>Done</option>
+                </select>
+            </div>
+
+            <!--Description-->
+            <div class="col-md-8 d-flex align-items-center">
+                <label for="description" class="form-label-left">Description</label>
+                <input type="text" class="form-control form-input"
+                       id="description" name="description" placeholder="Optional details...">
+            </div>
+
+        </div>
+
+        <div class="text-center">
+            <button class="btn btn-primary px-4 py-2" type="submit">Create Task</button>
+        </div>
+
+    </form>
+</div>
+
+<!--ALL TASKS--->
+<!--My dad helped with the pagination part and some parts of Edit Tasks-->
+<hr class="my-5">
+
+<h2 class="mb-4 text-center">All Tasks</h2>
+
+<!--Sorting Controls-->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <!--Pagination-->
+    <div>
+        <button id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+        <span id="page-info" class="mx-2 font-weight-bold"></span>
+        <button id="next-btn" class="btn btn-secondary" disabled>Next</button>
+    </div>
+
+</div>
+
+<div id="task-table-container">
+    <p>Loading tasks...</p>
+</div>
+
+
+<!--Edit Task-->
+
+<div class="modal fade" id="editTaskModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Task</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="editTaskForm">
+                    <input type="hidden" id="edit-task-id" name="id">
+
+                    <div class="form-group">
+                        <label for="edit-title">Task Title</label>
+                        <input type="text" class="form-control" id="edit-title" name="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-description">Description</label>
+                        <textarea class="form-control" id="edit-description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-due_date">Due Date (Optional)</label>
+                        <input type="date" class="form-control" id="edit-due_date" name="due_date">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-priority">Priority</label>
+                        <select class="form-control" id="edit-priority" name="priority">
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select class="form-control" id="edit-status" name="status">
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveTaskButton">Save Changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--delete Modal-->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                Are you sure you want to permanently delete this task? This action cannot be undone.
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete Task</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--Toast container (AI helped with this code part)-->
+<div class="toast-container position-fixed p-3" style="top: 20px; left: 50%; transform: translateX(-50%);"></div>
+
+<script src="/static/tasks.js"></script>
+{% endblock %}
